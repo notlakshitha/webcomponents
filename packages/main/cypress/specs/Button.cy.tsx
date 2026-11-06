@@ -13,6 +13,23 @@ import {
 } from "../../src/generated/i18n/i18n-defaults.js";
 
 describe("Button general interaction", () => {
+	it("does not crash when ElementInternals.states is missing (Safari 17)", () => {
+		cy.mount(<Button>Action Bar Button</Button>);
+
+		cy.get<Button>("[ui5-button]")
+			.then($button => {
+				const button = $button[0];
+				// Simulate browsers without CustomStateSet support.
+				Object.defineProperty(button._internals, "states", {
+					configurable: true,
+					get() {
+						return undefined;
+					},
+				});
+				expect(() => button._setBadgeOverlayStyle()).to.not.throw();
+			});
+	});
+
 	it("tests button's text rendering", () => {
 		cy.mount(<Button icon={download} design="Negative">Action Bar Button</Button>);
 

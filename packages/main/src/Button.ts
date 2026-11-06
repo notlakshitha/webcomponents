@@ -501,12 +501,19 @@ class Button extends UI5Element implements IButton {
 	}
 
 	_setBadgeOverlayStyle() {
+		// Safari 17 exposes ElementInternals but not CustomStateSet (`states`).
+		// Unguarded add/delete crashes every Button during onBeforeRendering.
+		const states = this._internals?.states;
+		if (!states) {
+			return;
+		}
+
 		const needsOverflowVisible = this.badge.length && (this.badge[0].design === ButtonBadgeDesign.AttentionDot || this.badge[0].design === ButtonBadgeDesign.OverlayText);
 
 		if (needsOverflowVisible) {
-			this._internals.states.add("has-overlay-badge");
+			states.add("has-overlay-badge");
 		} else {
-			this._internals.states.delete("has-overlay-badge");
+			states.delete("has-overlay-badge");
 		}
 	}
 
